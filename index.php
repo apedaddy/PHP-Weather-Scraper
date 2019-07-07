@@ -6,12 +6,22 @@ if ($_GET['city']) {
     // some cities may have name with space(s) in the middle example: Addis Ababa, San Francisco etc
     $file_headers = @get_headers("https://www.weather-forecast.com/locations/" . $city . "/forecasts/latest");
     if (!$file_headers || $file_headers[0] == 'HTTP/1.1 404 Not Found') {
-        $errorInfo = "The city could not be found";
+        $errorInfo = '<strong>'.$_GET['city']."</strong> could not be found in our list or there are some internal errors. Please check if any spelling error(s).";
     } else {
         $weatherReport = file_get_contents("https://www.weather-forecast.com/locations/" . $city . "/forecasts/latest");
         $wholePageArray = explode('(1&ndash;3 days)</span><p class="b-forecast__table-description-content"><span class="phrase">', $weatherReport);
-        $specificArray = explode('</span></p></td><td class="b-forecast__table-description-cell--js"', $wholePageArray[1]);
-        $weatherInfo = $specificArray[0];
+        if (sizeof($wholePageArray)>1){
+        
+            $specificArray = explode('</span></p></td><td class="b-forecast__table-description-cell--js"', $wholePageArray[1]);
+            if (sizeof($specificArray) >1) {
+                $weatherInfo = $specificArray[0];
+            } else {
+                $errorInfo = '<strong>'.$_GET['city']."</strong> could not be found in our list or there are some internal errors. Please check if any spelling error(s).";
+            }
+            
+        } else{
+            $errorInfo = '<strong>'.$_GET['city']."</strong> could not be found in our list or there are some internal errors. Please check if any spelling error(s).";
+        }
     }
 }
 
